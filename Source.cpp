@@ -1,5 +1,7 @@
 #include <iostream>
-#include  <iomanip>
+#include <iomanip>
+#include <cmath>
+#include <ctime>
 
 using namespace std;
 
@@ -54,27 +56,65 @@ cacheResType cacheSimDM(unsigned int addr)
 }
 
 // Fully Associative Cache Simulator
-cacheResType cacheSimFA(unsigned int addr)
+cacheResType cacheSimFA(unsigned int addr, int line_size, unsigned int A[])
 {	
-	// This function accepts the memory address for the read and 
-	// returns whether it caused a cache miss or a cache hit
+  static int empty_slots = CACHE_SIZE / line_size;
+  int slots = CACHE_SIZE / line_size;
 
-	// The current implementation assumes there is no cache; so, every transaction is a miss
+  int offset_bits = log (line_size) / log (2);
+  unsigned int tag = addr >> int(offset_bits);
+
+  for(int i=0; i<slots;i++)
+    if (A[i] == tag)
+      return HIT;
+
+  //Puts address in ascending order at first
+  if (empty_slots > 0)
+  {
+    A[slots - empty_slots] = tag;
+    empty_slots--;
+  }
+
+  //Randomly if no valid slots
+  else
+    A[rand() % slots] = tag;
+
 	return MISS;
 }
 char *msg[2] = {"Miss","Hit"};
 
 int main()
 {
+  srand(unsigned(time(NULL)));
 	int inst=0;
-	cacheResType r;
-	
-	unsigned int addr;
-	cout << "Direct Mapped Cache Simulator\n";
-	for(;inst<100;inst++)
+  int line_size;
+  int HITS = 0;
+  int MISSES = 0;
+  cacheResType r;
+  unsigned int addr;
+  unsigned int *A;
+
+  cout<<"Enter cache line size (8, 16, 32, 64).\n> ";
+  cin>>line_size;
+
+  A = new unsigned int[CACHE_SIZE/line_size];
+
+	cout << "Fully Associative Cache Simulator\n";
+	for(;inst<1000000;inst++)
 	{
 		addr = memGen2();
-		r = cacheSimDM(addr);
-		cout <<"0x" << setfill('0') << setw(8) << hex << addr <<" ("<< msg[r] <<")\n";
+		r = cacheSimFA(addr, line_size, A);
+
+    if (r == HIT)
+      HITS++;
+    else
+      MISSES++;
+
+		//cout <<"0x" << setfill('0') << setw(8) << hex << addr <<" ("<< msg[r] <<")\n";
 	}
+
+  cout <<"Hits: " <<dec <<HITS <<endl;
+  cout <<"Misses: " <<dec <<MISSES <<endl;
+
+  delete [] A;
 }

@@ -24,7 +24,7 @@ unsigned int rand_()
 
 unsigned int memGen1()
 {
-	static unsigned int addr=0;
+	static unsigned int addr=0;   //static means that variable is saved through function calls
 	return (addr++)%(DRAM_SIZE);
 }
 

@@ -1,3 +1,8 @@
+//Shady Fanous 900131223
+//Ahmed Ewais 900132986
+//CS231 Project 2
+//Cache Simulator
+
 #include <iostream>
 #include <iomanip>
 #include <cmath>

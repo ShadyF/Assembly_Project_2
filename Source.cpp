@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <cmath>
 #include <ctime>
-#include<map>
+#include <map>
 using namespace std;
 
 #define		DBG				1
@@ -100,31 +100,68 @@ int main()
 	int line_size;
 	int HITS = 0;
 	int MISSES = 0;
+  int prompt;
 	cacheResType r;
 	unsigned int addr;
 	unsigned int *A;
 	map<unsigned int, unsigned int> TABLE;
+
+  cout<<"Select Type of Cache:\n";
+  cout<<"1. Direct Mapped\n";
+  cout<<"2. Fully Associative\n>";
+  cin>>prompt;
+
+  if (prompt != 1 && prompt != 2)
+  {
+    cout <<"Incorrect input, type either 1 or 2\n> ";
+    cin >>prompt;
+  }
 	cout << "Enter cache line size (8, 16, 32, 64).\n> ";
 	cin >> line_size;
 
 	A = new unsigned int[CACHE_SIZE / line_size];
 
-	//cout << "Fully Associative Cache Simulator\n";
-	for (; inst<1000000; inst++)
-	{
-		addr = memGen4();
-		r = cacheSimDM(addr, line_size, TABLE);
+  if(prompt == 1)
+  {
+	  cout<<"\nDirect Mapped Cache Simulator\n";
 
-		if (r == HIT)
-			HITS++;
-		else
-			MISSES++;
+    for (; inst<1000000; inst++)
+	  {
+		  addr = memGen1();
+		  r = cacheSimDM(addr, line_size, TABLE);
 
-		//cout <<"0x" << setfill('0') << setw(8) << hex << addr <<" ("<< msg[r] <<")\n";
-	}
+		  if (r == HIT)
+			  HITS++;
+		  else
+			  MISSES++;
 
-	cout << "Hits: " << dec << HITS << endl;
-	cout << "Misses: " << dec << MISSES << endl;
+		 //cout <<"0x" << setfill('0') << setw(8) << hex << addr <<" ("<< msg[r] <<")\n";
+	  }
+  }
+  else
+  {
+    cout<<"\nFully Associative Cache Simulator\n";
+
+    for (; inst<1000000; inst++)
+	  {
+		  addr = memGen4();
+		  r = cacheSimFA(addr, line_size, A);
+
+		  if (r == HIT)
+			  HITS++;
+		  else
+			  MISSES++;
+
+		  //cout <<"0x" << setfill('0') << setw(8) << hex << addr <<" ("<< msg[r] <<")\n";
+	  }
+  }
+  
+	cout << "\nHits: " << dec << HITS << endl;
+	cout << "Misses: " << dec << MISSES << endl <<endl;
+
+  cout << "Hit Ratio: " <<(HITS/1000000.0) * 100 <<"%" <<endl;
+  cout << "Miss Ratio: " <<100 - ((HITS/1000000.0) * 100) <<"%" <<endl <<endl;
+
 	delete[] A;
 	return 0;
 }
